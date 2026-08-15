@@ -59,6 +59,24 @@ export function useOrchestraRadio() {
 
   const next = useCallback(() => advance(1), [advance]);
 
+  /**
+   * Jump by a number of seconds within the current song.
+   *
+   * Clamped at both ends rather than allowed to run past them: seeking beyond
+   * the duration makes YouTube fire `ENDED`, which would skip to the next song
+   * — so a forward nudge near the end of a track would silently behave like the
+   * next button. Held a quarter-second short of the end for the same reason.
+   * Before the first press there is nothing loaded to seek within.
+   */
+  const skip = useCallback(
+    (seconds: number) => {
+      if (!started) return;
+      const limit = player.duration > 0 ? player.duration - 0.25 : Infinity;
+      player.seek(Math.min(Math.max(player.currentTime + seconds, 0), limit));
+    },
+    [started, player]
+  );
+
   const previous = useCallback(() => {
     // Past three seconds, "previous" restarts the song rather than leaving it.
     if (player.currentTime > 3) {
@@ -90,6 +108,7 @@ export function useOrchestraRadio() {
     toggle,
     next,
     previous,
+    skip,
     selectPlaylist,
     setVolume: setVolumeState,
   };

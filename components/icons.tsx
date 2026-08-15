@@ -76,6 +76,54 @@ export const NextIcon = ({ size = 22, className }: IconProps) => (
   </svg>
 );
 
+/**
+ * Skip back and forward ten seconds.
+ *
+ * A three-quarter circle with an arrowhead on the open end and the number set
+ * inside it — the shape everyone already reads as "jump by this much". The two
+ * are mirror images, so one path is drawn and the whole group is flipped for
+ * the other; the number has to be flipped back or it would read as "0I".
+ */
+const Skip10 = ({ size, className, back }: IconProps & { back: boolean }) => (
+  <svg {...box(size ?? 24)} className={className} fill="none">
+    <g transform={back ? "scale(-1,1) translate(-24,0)" : undefined}>
+      {/* Arc centred on (12,13), r=8, opened at the top for the arrowhead. */}
+      <path
+        d="M12 5a8 8 0 1 1-7 4.1"
+        stroke="currentColor"
+        strokeWidth="1.5"
+        strokeLinecap="round"
+      />
+      <path
+        d="M11.6 1.9 15 5l-3.4 3.1"
+        stroke="currentColor"
+        strokeWidth="1.5"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+    </g>
+    {/* Baseline sits at the circle's centre plus about a third of the cap
+        height, which is what puts the digits optically in the middle rather
+        than resting on the bottom of the arc. */}
+    <text
+      x="12"
+      y="16.1"
+      textAnchor="middle"
+      fontSize="8.6"
+      fontWeight="700"
+      letterSpacing="-0.4"
+      fill="currentColor"
+      stroke="none"
+      fontFamily="var(--font-body), system-ui, sans-serif"
+    >
+      10
+    </text>
+  </svg>
+);
+
+export const Back10Icon = (props: IconProps) => <Skip10 {...props} back />;
+export const Forward10Icon = (props: IconProps) => <Skip10 {...props} back={false} />;
+
 export const VolumeIcon = ({ size = 16, className }: IconProps) => (
   <svg {...box(size)} className={className} fill="currentColor">
     <path d="M4 9.6v4.8a.9.9 0 0 0 .9.9h2.6l3.6 2.9c.6.48 1.5.06 1.5-.7V6.5c0-.76-.9-1.18-1.5-.7L7.5 8.7H4.9a.9.9 0 0 0-.9.9Z" />

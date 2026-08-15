@@ -9,6 +9,8 @@ import {
   PauseIcon,
   PrevIcon,
   NextIcon,
+  Back10Icon,
+  Forward10Icon,
   VolumeIcon,
   MuteIcon,
   NoteIcon,
@@ -58,9 +60,17 @@ export function PlayerBar({ radio }: { radio: Radio }) {
         </div>
 
         {/* ── Transport ──────────────────────────────────────────────────── */}
-        <div className="flex shrink-0 items-center justify-center gap-4 sm:gap-5">
+        <div className="flex shrink-0 items-center justify-center gap-1.5 sm:gap-3">
           <IconButton label="Previous song" onClick={radio.previous}>
             <PrevIcon />
+          </IconButton>
+
+          <IconButton
+            label="Back 10 seconds"
+            onClick={() => radio.skip(-10)}
+            disabled={!radio.started}
+          >
+            <Back10Icon />
           </IconButton>
 
           <button
@@ -77,6 +87,14 @@ export function PlayerBar({ radio }: { radio: Radio }) {
           >
             {playing ? <PauseIcon /> : <PlayIcon />}
           </button>
+
+          <IconButton
+            label="Forward 10 seconds"
+            onClick={() => radio.skip(10)}
+            disabled={!radio.started}
+          >
+            <Forward10Icon />
+          </IconButton>
 
           <IconButton label="Next song" onClick={radio.next}>
             <NextIcon />
@@ -145,19 +163,26 @@ function IconButton({
   label,
   onClick,
   children,
+  disabled,
 }: {
   label: string;
   onClick: () => void;
   children: React.ReactNode;
+  disabled?: boolean;
 }) {
   return (
     <button
       type="button"
       onClick={onClick}
       aria-label={label}
+      disabled={disabled}
+      title={label}
       className={cx(
-        "grid h-10 w-10 shrink-0 place-items-center rounded-full text-cream/85",
-        "transition-colors duration-200 hover:bg-cream/10 hover:text-cream active:scale-95"
+        "grid h-9 w-9 shrink-0 place-items-center rounded-full text-cream/85 sm:h-10 sm:w-10",
+        "transition-colors duration-200 hover:bg-cream/10 hover:text-cream active:scale-95",
+        // Nothing is loaded before the first press, so a nudge would do nothing
+        // and give no clue why.
+        disabled && "pointer-events-none opacity-35"
       )}
     >
       {children}
