@@ -1,0 +1,161 @@
+@import "tailwindcss";
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   DESIGN TOKENS
+   Change a hex here and the whole site follows. Tailwind v4 theme values, so
+   `bg-ink`, `text-amber`, `border-gold` all work as utilities.
+   ═══════════════════════════════════════════════════════════════════════════ */
+@theme {
+  --color-ink: #0d0805;
+  --color-ink-soft: #150d08;
+  --color-brown: #2a1a10;
+  --color-brown-light: #3b2416;
+  --color-amber: #e9a34c;
+  --color-gold: #d8b978;
+  --color-gold-dim: #8f7442;
+  --color-cream: #f2e6d0;
+  --color-cream-dim: #b7a488;
+  --color-ember: #d6412f;
+
+  --font-display: var(--font-tiro), Georgia, serif;
+  --font-body: var(--font-mukta), system-ui, sans-serif;
+}
+
+:root {
+  --grain-opacity: 0.09;
+  /* Warm key light over the scene. Kept as a variable so a future programme
+     switch can retint the whole night. */
+  --glow: #e9a34c;
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   BASE
+   ═══════════════════════════════════════════════════════════════════════════ */
+html {
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  background-color: var(--color-ink);
+  color: var(--color-cream);
+  font-family: var(--font-body);
+  -webkit-font-smoothing: antialiased;
+}
+
+:focus-visible {
+  outline: 2px solid var(--color-amber);
+  outline-offset: 3px;
+  border-radius: 4px;
+}
+
+::selection {
+  background: var(--color-amber);
+  color: var(--color-ink);
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   SURFACES
+   Two glass treatments, warm rather than blue-grey, so overlays sit in the
+   same light as the artwork behind them.
+   ═══════════════════════════════════════════════════════════════════════════ */
+.glass {
+  background: linear-gradient(
+    160deg,
+    rgba(38, 24, 15, 0.82) 0%,
+    rgba(18, 11, 7, 0.88) 100%
+  );
+  backdrop-filter: blur(14px) saturate(115%);
+  -webkit-backdrop-filter: blur(14px) saturate(115%);
+  border: 1px solid rgba(216, 185, 120, 0.16);
+  box-shadow:
+    0 24px 60px -24px rgba(0, 0, 0, 0.9),
+    inset 0 1px 0 rgba(242, 230, 208, 0.06);
+}
+
+.glass-strong {
+  background: linear-gradient(
+    160deg,
+    rgba(32, 20, 13, 0.94) 0%,
+    rgba(14, 9, 6, 0.97) 100%
+  );
+  backdrop-filter: blur(20px) saturate(120%);
+  -webkit-backdrop-filter: blur(20px) saturate(120%);
+  border: 1px solid rgba(216, 185, 120, 0.2);
+  box-shadow: 0 30px 80px -20px rgba(0, 0, 0, 0.95);
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   FILM GRAIN
+   One inline SVG turbulence over the whole page. Cheap, always on, and the
+   single strongest cue that this is film rather than a screenshot.
+   ═══════════════════════════════════════════════════════════════════════════ */
+.film-grain {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='140' height='140' filter='url(%23n)' opacity='0.5'/%3E%3C/svg%3E");
+  opacity: var(--grain-opacity);
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   ANIMATION
+   Deliberately sparse. The scene should feel lit, not animated.
+   ═══════════════════════════════════════════════════════════════════════════ */
+@keyframes lamp-breathe {
+  0%, 100% { opacity: 0.72; }
+  50%      { opacity: 1; }
+}
+
+@keyframes live-pulse {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50%      { opacity: 0.4; transform: scale(0.86); }
+}
+
+@keyframes rise-in {
+  from { opacity: 0; transform: translateY(14px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes fade-in {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+@keyframes slide-up {
+  from { opacity: 0; transform: translateY(24px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* Cassette reels. */
+@keyframes reel-turn {
+  to { transform: rotate(360deg); }
+}
+
+.anim-lamp { animation: lamp-breathe 6s ease-in-out infinite; }
+.anim-live { animation: live-pulse 2s ease-in-out infinite; }
+.anim-rise { animation: rise-in 900ms cubic-bezier(0.22, 1, 0.36, 1) both; }
+.anim-fade { animation: fade-in 700ms ease-out both; }
+.anim-slide-up { animation: slide-up 320ms cubic-bezier(0.22, 1, 0.36, 1) both; }
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   REDUCED MOTION
+   ═══════════════════════════════════════════════════════════════════════════ */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+  }
+}
+
+/* Panels scroll without a visible scrollbar; keyboard scrolling still works. */
+.quiet-scroll {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(216, 185, 120, 0.25) transparent;
+}
+.quiet-scroll::-webkit-scrollbar {
+  width: 6px;
+}
+.quiet-scroll::-webkit-scrollbar-thumb {
+  background: rgba(216, 185, 120, 0.25);
+  border-radius: 999px;
+}

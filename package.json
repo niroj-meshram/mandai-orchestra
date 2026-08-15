@@ -1,0 +1,27 @@
+{
+  "name": "mandai-orchestra",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Mandai Orchestra — an illustrated mandai stage night for CG, Bhojpuri and stage classics.",
+  "scripts": {
+    "dev": "next dev",
+    "build": "node scripts/sync-playlist.mjs && next build",
+    "start": "next start",
+    "lint": "next lint",
+    "sync-playlist": "node scripts/sync-playlist.mjs"
+  },
+  "dependencies": {
+    "next": "15.5.4",
+    "react": "19.1.0",
+    "react-dom": "19.1.0"
+  },
+  "devDependencies": {
+    "@tailwindcss/postcss": "4.1.13",
+    "@types/node": "22.10.2",
+    "@types/react": "19.1.0",
+    "@types/react-dom": "19.1.0",
+    "postcss": "8.5.6",
+    "tailwindcss": "4.1.13",
+    "typescript": "5.7.2"
+  }
+}
