@@ -52,8 +52,13 @@ export default function HomePage() {
     return () => window.removeEventListener("keydown", onKey);
   }, [radio, playlistsOpen, songsOpen]);
 
+  // The frame scrolls on a phone and is sealed on a desktop. A short landscape
+  // screen cannot fit the player and the title at once, and clipping there
+  // hides the scrubber rather than merely looking cramped — so the column is
+  // allowed to run over and be scrolled to. The stage behind is position:fixed,
+  // so it stays put while that happens.
   return (
-    <main className="relative h-dvh w-full overflow-hidden">
+    <main className="relative h-dvh w-full overflow-x-hidden overflow-y-auto sm:overflow-hidden">
       <StageScene />
 
       {/* The YouTube iframe stays mounted off-screen for the whole session.
@@ -66,28 +71,43 @@ export default function HomePage() {
         <div ref={player.hostRef} />
       </div>
 
-      <TopBar
-        live={player.playing}
-        onOpenPlaylists={() => setPlaylistsOpen(true)}
-        onOpenSongs={() => setSongsOpen(true)}
-      />
+      {/* ── Composition ────────────────────────────────────────────────────
+          Two layouts, one markup.
 
-      <Masthead />
+          On a phone this is a flex column and every child sits in normal flow,
+          so the browser works out where things go from how tall they actually
+          are. That is the point: the earlier version placed each block at a
+          hand-measured offset, and every one of those numbers was a guess that
+          went wrong the moment the live pill wrapped to two lines or the screen
+          turned landscape — the title would land under the player.
+
+          From sm up there is room for the poster composition it was designed
+          as, so each child re-absolutes itself against this box. */}
+      <div className="relative z-10 flex min-h-full flex-col sm:block">
+        <TopBar
+          live={player.playing}
+          onOpenPlaylists={() => setPlaylistsOpen(true)}
+          onOpenSongs={() => setSongsOpen(true)}
+        />
+
+        <Masthead />
+
+        {/* Lets the stage breathe between the title and the player, and takes
+            up whatever is left over rather than a fixed amount. */}
+        <div aria-hidden className="min-h-0 flex-1 sm:hidden" />
+
+        <PlayerBar radio={radio} />
+
+        <footer className="pointer-events-none z-10 px-3 pb-2.5 text-center sm:absolute sm:inset-x-0 sm:bottom-3 sm:px-4 sm:pb-0">
+          <p className="font-body text-[8px] uppercase tracking-[0.16em] text-cream-dim/45 sm:text-[11px] sm:tracking-[0.34em]">
+            {site.footer}
+          </p>
+        </footer>
+      </div>
 
       <PageCopy />
 
       <QuoteCard />
-
-      <PlayerBar radio={radio} />
-
-      {/* The tracking is what makes this line long. At 0.34em it wraps to two
-          lines on a phone and the second one lands under the player, so the
-          spacing tightens before the type size does. */}
-      <footer className="pointer-events-none absolute inset-x-0 bottom-2.5 z-10 px-3 text-center sm:bottom-3 sm:px-4">
-        <p className="font-body text-[8px] uppercase tracking-[0.16em] text-cream-dim/45 sm:text-[11px] sm:tracking-[0.34em]">
-          {site.footer}
-        </p>
-      </footer>
 
       <PlaylistsPanel
         open={playlistsOpen}

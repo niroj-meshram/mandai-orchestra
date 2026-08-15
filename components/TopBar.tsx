@@ -22,7 +22,7 @@ export function TopBar({
   const { time, meridiem, date, dateShort } = useClock();
 
   return (
-    <header className="pointer-events-none absolute inset-x-0 top-0 z-20 px-4 pt-4 sm:px-8 sm:pt-7">
+    <header className="pointer-events-none z-20 px-4 pt-4 sm:absolute sm:inset-x-0 sm:top-0 sm:px-8 sm:pt-7">
       <div className="flex items-start justify-between gap-3 sm:gap-4">
         {/* ── Clock ─────────────────────────────────────────────────────── */}
         <div className="anim-fade min-w-0">
@@ -76,7 +76,7 @@ export function TopBar({
               )}
               style={{ boxShadow: "0 0 8px var(--color-ember)" }}
             />
-            <span className="font-body text-[9px] font-medium uppercase tracking-[0.18em] text-cream sm:text-[10px] sm:tracking-[0.22em]">
+            <span className="whitespace-nowrap font-body text-[9px] font-medium uppercase tracking-[0.18em] text-cream sm:text-[10px] sm:tracking-[0.22em]">
               Live Program
             </span>
           </p>

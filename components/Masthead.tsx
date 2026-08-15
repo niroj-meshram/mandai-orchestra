@@ -5,14 +5,14 @@ import { site } from "@/data/site";
  * size, the English name reads as its translation underneath, and the tagline
  * closes the group — three sizes, one centre line, nothing else.
  *
- * On a phone the title has to clear the top-left column, which is a stack of
- * fixed-height rows — so the offset there is in px too. A vh offset tracks the
- * viewport instead of the thing it needs to sit below, and on a short screen
- * the title climbs straight into the clock and the credit.
+ * On a phone this sits in normal flow directly under the top bar, so it clears
+ * the clock and the credit by construction however tall those turn out to be.
+ * Only from sm up, where there is room for the poster composition, does it lift
+ * out and position itself against the frame.
  */
 export function Masthead() {
   return (
-    <div className="pointer-events-none absolute inset-x-0 top-[152px] z-10 px-5 text-center sm:top-[17vh] sm:px-6">
+    <div className="pointer-events-none z-10 mt-7 px-5 text-center sm:absolute sm:inset-x-0 sm:top-[17vh] sm:mt-0 sm:px-6">
       {/* Painted gold rather than coloured gold: a top-down gradient is clipped
           to the glyphs so each letter is pale at the head and deepens toward
           the foot, the way the name reads on the stage banner.
@@ -56,11 +56,9 @@ export function Masthead() {
       >
         <Rule side="left" />
         <p
-          className="font-display uppercase"
+          className="whitespace-nowrap font-display uppercase tracking-[0.2em] indent-[0.2em] sm:tracking-[0.35em] sm:indent-[0.35em]"
           style={{
             fontSize: "clamp(0.8rem, 1.6vw, 1.25rem)",
-            letterSpacing: "0.35em",
-            textIndent: "0.35em",
             backgroundImage:
               "linear-gradient(180deg, #f2e6d0 0%, #f2e6d0 42%, #d8b978 100%)",
             WebkitBackgroundClip: "text",
@@ -95,7 +93,7 @@ function Rule({ side }: { side: "left" | "right" }) {
   return (
     <span
       aria-hidden
-      className="block h-px w-10 sm:w-20"
+      className="block h-px w-5 sm:w-20"
       style={{
         background:
           side === "left"

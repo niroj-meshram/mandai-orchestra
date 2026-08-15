@@ -30,7 +30,7 @@ export function PlayerBar({ radio }: { radio: Radio }) {
   return (
     <section
       aria-label="Player"
-      className="anim-slide-up absolute inset-x-0 bottom-8 z-20 px-3 sm:bottom-12 sm:px-8"
+      className="anim-slide-up z-20 px-3 sm:absolute sm:inset-x-0 sm:bottom-12 sm:px-8"
       style={{ animationDelay: "300ms" }}
     >
       <div className="glass-strong mx-auto flex max-w-5xl flex-col gap-3 rounded-xl px-4 py-3.5 sm:flex-row sm:items-center sm:gap-6 sm:px-6 sm:py-5">
