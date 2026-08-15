@@ -29,7 +29,9 @@ export const metadata: Metadata = {
   metadataBase: new URL(site.url),
 
   title: {
-    default: `${site.titleHi} · ${site.titleEn} — CG, Bhojpuri & Stage Classics`,
+    default: site.metaTitle,
+    // Category pages write their own full title, so this only catches anything
+    // that forgets to — better a branded suffix than a bare page name.
     template: `%s · ${site.titleEn}`,
   },
   description: site.description,

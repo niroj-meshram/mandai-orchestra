@@ -22,8 +22,13 @@ export const site = {
    * ones matter most — a phrase nobody else has written a page for is winnable
    * in a way that a single common word never is.
    */
+  /** The homepage title tag, front-loaded with the phrase it is written for. */
+  metaTitle:
+    "Mandai Orchestra – Chhattisgarhi Orchestra Songs, CG Stage Program & Bhojpuri Orchestra",
+
+  /** Kept to roughly 155 characters, which is about where Google truncates. */
   description:
-    "मंडई ऑर्केस्ट्रा — a mandai stage night that never got packed up. Chhattisgarhi, Bhojpuri and stage-classic orchestra songs playing back to back, free, with no sign-up.",
+    "मंडई ऑर्केस्ट्रा — Chhattisgarhi orchestra songs, CG stage program classics and Bhojpuri orchestra nights, playing back to back all night. No sign-up.",
   descriptionShort:
     "CG, Bhojpuri and stage-classic orchestra songs, playing all night.",
   /** Printed on the banner in the stage artwork; repeated for screen readers. */
@@ -35,25 +40,23 @@ export const site = {
    * and the structured data are written in, which is what actually gets read.
    */
   keywords: [
+    "chhattisgarhi orchestra songs",
+    "cg orchestra songs",
+    "chhattisgarhi stage program songs",
+    "bhojpuri orchestra songs",
+    "mela orchestra songs",
+    "mandai orchestra songs",
+    "chhattisgarhi live orchestra",
+    "cg live stage songs",
+    "orchestra night songs",
+    "diwali mandai orchestra",
+    "chhattisgarhi cultural music",
     "mandai orchestra",
     "मंडई ऑर्केस्ट्रा",
-    "cg orchestra",
     "छत्तीसगढ़ी ऑर्केस्ट्रा",
-    "chhattisgarhi orchestra",
-    "cg archestra",
-    "orchestra song",
-    "cg orchestra song",
-    "chhattisgarhi songs",
-    "bhojpuri orchestra",
     "भोजपुरी ऑर्केस्ट्रा",
-    "orchestra night",
-    "stage program",
+    "cg archestra",
     "स्टेज प्रोग्राम",
-    "cg stage show",
-    "mandai night",
-    "cg song playlist",
-    "orchestra playlist",
-    "desi orchestra",
   ],
 
   /** Credit in the top-left corner, under the live lamp. */

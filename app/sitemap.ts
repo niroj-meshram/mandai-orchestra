@@ -1,21 +1,33 @@
 import type { MetadataRoute } from "next";
 import { site } from "@/data/site";
+import { categories } from "@/data/categories";
 
 /**
  * Next generates /sitemap.xml from this.
  *
- * One page, because that is genuinely all there is — a single-screen player.
- * The value here is not the list, it is `lastModified`: the playlist is
- * re-fetched on every build, so this stamps each deploy and tells a crawler the
- * page is worth looking at again.
+ * Derived from the category list rather than typed out, so a new programme is
+ * in the sitemap the moment it exists — a hand-maintained list of URLs is a
+ * list that silently goes stale, and a page missing from it is a page that may
+ * never get crawled.
+ *
+ * `lastModified` is stamped at build time, and the playlist is re-fetched on
+ * every build, so it genuinely tracks when the content last changed.
  */
 export default function sitemap(): MetadataRoute.Sitemap {
+  const now = new Date();
+
   return [
     {
       url: `${site.url}/`,
-      lastModified: new Date(),
+      lastModified: now,
       changeFrequency: "weekly",
       priority: 1,
     },
+    ...categories.map((category) => ({
+      url: `${site.url}/${category.slug}`,
+      lastModified: now,
+      changeFrequency: "weekly" as const,
+      priority: 0.8,
+    })),
   ];
 }

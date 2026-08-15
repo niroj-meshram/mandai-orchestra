@@ -29,13 +29,63 @@ const OUT = resolve(HERE, "../data/playlists.ts");
 /** Used when no URL is passed on the command line. */
 const PLAYLIST = "https://www.youtube.com/playlist?list=PLS2iHXuLbS-w";
 
-/** How the programme is billed on the site. */
-const BILLING = {
-  id: "orchestra",
-  name: "Orchestra",
-  nameHi: "ऑर्केस्ट्रा",
-  tagline: "पूरी रात का प्रोग्राम",
-};
+/**
+ * The programmes the one YouTube playlist is dealt into.
+ *
+ * There is a single source of songs; these are views onto it, each one a page
+ * on the site and a programme in the panel. A song can appear in more than one
+ * — a Chhattisgarhi dance number belongs on the CG page and in the mela set,
+ * and pretending otherwise would mean six thin lists instead of six useful
+ * ones. `id` is also the URL slug, so changing one moves a page.
+ */
+const PROGRAMMES = [
+  {
+    id: "chhattisgarhi-orchestra-songs",
+    name: "Chhattisgarhi Orchestra Hits",
+    nameHi: "छत्तीसगढ़ी ऑर्केस्ट्रा",
+    tagline: "गाँव के मंच से, सीधे",
+    match: (s) => s.lang === "cg",
+  },
+  {
+    id: "cg-stage-program-songs",
+    name: "CG Stage Program Classics",
+    nameHi: "स्टेज प्रोग्राम",
+    tagline: "साउंड चेक से सुबह तक",
+    // The up-tempo running order: regional, and not one of the slow ones.
+    match: (s) => s.lang !== "hindi" && !["late-night", "sad"].includes(s.mood),
+  },
+  {
+    id: "bhojpuri-orchestra-songs",
+    name: "Bhojpuri Orchestra Dance Songs",
+    nameHi: "भोजपुरी ऑर्केस्ट्रा",
+    tagline: "स्पीकर फटने तक",
+    match: (s) => s.lang === "bhojpuri",
+  },
+  {
+    id: "mela-orchestra-songs",
+    name: "Mela Orchestra Collection",
+    nameHi: "मेला ऑर्केस्ट्रा",
+    tagline: "झूला, जलेबी, जनरेटर",
+    // What a mela crowd actually stands in front of: the dance and the
+    // singalong numbers. Keyed on "dance" alone this came out at two songs,
+    // because the mood guess falls back to "dhun" for anything unlabelled.
+    match: (s) => ["dance", "romantic"].includes(s.mood),
+  },
+  {
+    id: "mandai-orchestra-night",
+    name: "Mandai Night Orchestra",
+    nameHi: "मंडई नाइट",
+    tagline: "बारह के बाद वाला प्रोग्राम",
+    match: (s) => ["late-night", "sad", "romantic", "bhakti"].includes(s.mood),
+  },
+  {
+    id: "orchestra-classics",
+    name: "Orchestra Classics & Live Performances",
+    nameHi: "ऑर्केस्ट्रा क्लासिक्स",
+    tagline: "फिल्मी गाना, लोकल बैंड",
+    match: (s) => s.lang === "hindi" || s.mood === "dhun",
+  },
+];
 
 const UA =
   "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36";
@@ -271,17 +321,68 @@ function guessMood(raw) {
   return "dhun";
 }
 
+/**
+ * Which tradition a song comes out of, read off the title and the channel that
+ * posted it.
+ *
+ * Chhattisgarhi is checked first and deliberately: a CG song is frequently
+ * uploaded by a channel with "Bhojpuri" in its name, because the labels serve
+ * both markets, but the reverse almost never happens — a Bhojpuri song rarely
+ * carries CG vocabulary. So the more specific signal wins, and the fallback is
+ * "hindi", which here means the film songs the local bands covered.
+ */
+const CG =
+  /\bcg\b|chhattisgarh|chhatisgarh|छत्तीसगढ़|सरगुज|\b(turi|tura|mor|tor|dai|sangi|maya|bihaav|bihav|gawan|karma|sua|panthi|jhan|chube|fuljhadi|sargujiha|barman|gorelal)\b|टूरी|टूरा|मोर|तोर|दाई|संगी|बिहाव/i;
+
+const BHOJPURI =
+  /bhojpuri|भोजपुरी|\b(bhauji|saiyan|piyawa|balamua|balmua|raja ji|lahariya|lahanga|odhaniya|jawani|chhathi|nirahua|pawan singh|sakal|amrapali)\b|भउजी|सैंया|पियवा|लहरिया|जवानी/i;
+
+function guessLang(raw, channel) {
+  const hay = `${raw} ${channel}`;
+  if (CG.test(hay)) return "cg";
+  if (BHOJPURI.test(hay)) return "bhojpuri";
+  return "hindi";
+}
+
 // ─── Emitting ────────────────────────────────────────────────────────────────
 
 const quote = (s) => `"${s.replace(/\\/g, "\\\\").replace(/"/g, '\\"')}"`;
 
 function render(songs, listTitle) {
-  const rows = songs
+  const row = (s) =>
+    `      { title: ${quote(s.title)}, singer: ${quote(s.singer)}, ` +
+    `youtubeUrl: ${quote(s.youtubeUrl)}, duration: ${quote(s.duration)}, ` +
+    `mood: ${quote(s.mood)}, lang: ${quote(s.lang)}, year: ${s.year} },`;
+
+  // Deal the pool into programmes. A song that matches nothing would otherwise
+  // vanish from the site entirely, so the last programme takes the remainder —
+  // silently dropping songs is the one failure mode nobody would notice.
+  const claimed = new Set();
+  const dealt = PROGRAMMES.map((p) => {
+    const picked = songs.filter((s) => p.match(s));
+    picked.forEach((s) => claimed.add(s.youtubeUrl));
+    return { ...p, picked };
+  });
+
+  const orphans = songs.filter((s) => !claimed.has(s.youtubeUrl));
+  if (orphans.length) {
+    console.warn(`  ! ${orphans.length} song(s) matched no programme; added to "${dealt.at(-1).name}"`);
+    dealt.at(-1).picked.push(...orphans);
+  }
+
+  for (const p of dealt) console.log(`  · ${p.name}: ${p.picked.length}`);
+
+  const blocks = dealt
     .map(
-      (s) =>
-        `      { title: ${quote(s.title)}, singer: ${quote(s.singer)}, ` +
-        `youtubeUrl: ${quote(s.youtubeUrl)}, duration: ${quote(s.duration)}, ` +
-        `mood: ${quote(s.mood)}, year: ${s.year} },`
+      (p) => `  {
+    id: ${quote(p.id)},
+    name: ${quote(p.name)},
+    nameHi: ${quote(p.nameHi)},
+    tagline: ${quote(p.tagline)},
+    songs: [
+${p.picked.map(row).join("\n")}
+    ],
+  },`
     )
     .join("\n");
 
@@ -314,16 +415,22 @@ export type Mood =
   | "vidai"
   | "late-night";
 
+/** Which tradition a song comes out of. "hindi" means the film songs the
+    local bands covered, rather than anything sung in a village dialect. */
+export type Lang = "cg" | "bhojpuri" | "hindi";
+
 export interface Song {
   title: string;
   singer: string;
   youtubeUrl: string;
   duration: string;
   mood: Mood;
+  lang: Lang;
   year: number;
 }
 
 export interface Playlist {
+  /** Also the URL slug: /<id> is this programme's page. */
   id: string;
   name: string;
   /** Devanagari name, shown as the primary label in the panel. */
@@ -334,15 +441,7 @@ export interface Playlist {
 }
 
 export const playlists: Playlist[] = [
-  {
-    id: ${quote(BILLING.id)},
-    name: ${quote(BILLING.name)},
-    nameHi: ${quote(BILLING.nameHi)},
-    tagline: ${quote(BILLING.tagline)},
-    songs: [
-${rows}
-    ],
-  },
+${blocks}
 ];
 
 export const moodLabels: Record<Mood, string> = {
@@ -356,14 +455,31 @@ export const moodLabels: Record<Mood, string> = {
 };
 
 /**
- * Every song across every programme, flattened but still carrying where it came
- * from — the All Songs list needs the programme and the position to be able to
- * hand playback back to the right place.
+ * Every song, once, still carrying where it came from — the All Songs list
+ * needs the programme and the position to hand playback back to the right
+ * place. Programmes overlap on purpose, so this dedupes on the video: without
+ * that, a song in three programmes would be listed three times and the count
+ * under the heading would be a lie.
  */
 export const allSongs: { song: Song; playlist: Playlist; index: number }[] =
-  playlists.flatMap((playlist) =>
-    playlist.songs.map((song, index) => ({ song, playlist, index }))
-  );
+  (() => {
+    const seen = new Set<string>();
+    return playlists.flatMap((playlist) =>
+      playlist.songs.flatMap((song, index) => {
+        if (seen.has(song.youtubeUrl)) return [];
+        seen.add(song.youtubeUrl);
+        return [{ song, playlist, index }];
+      })
+    );
+  })();
+
+/** The distinct songs on the site, in programme order. */
+export const uniqueSongs: Song[] = allSongs.map((entry) => entry.song);
+
+/** Look a programme up by its slug. */
+export function playlistBySlug(slug: string): Playlist | undefined {
+  return playlists.find((p) => p.id === slug);
+}
 `;
 }
 
@@ -399,6 +515,7 @@ async function main() {
         youtubeUrl: `https://youtu.be/${id}`,
         duration: text(v.lengthText) || "0:00",
         mood: guessMood(raw),
+        lang: guessLang(raw, channel),
         id,
       };
     })

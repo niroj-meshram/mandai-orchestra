@@ -34,22 +34,21 @@ export function StructuredData() {
       url: site.url,
       sameAs: [site.author.linkedin, site.author.x],
     },
-    ...playlists.map((playlist) => ({
-      "@type": "MusicPlaylist",
-      "@id": `${site.url}/#${playlist.id}`,
-      name: `${playlist.nameHi} · ${playlist.name}`,
-      description: playlist.tagline,
-      url: `${site.url}/`,
-      numTracks: playlist.songs.length,
-      inLanguage: "hi-IN",
-      track: playlist.songs.map((song, i) => ({
-        "@type": "MusicRecording",
+    // Each programme is described in full on its own page, so here it is only
+    // referenced — repeating thirty tracks on the homepage as well would
+    // duplicate the same claim at two URLs and dilute both.
+    {
+      "@type": "ItemList",
+      "@id": `${site.url}/#programmes`,
+      name: "Programmes",
+      numberOfItems: playlists.length,
+      itemListElement: playlists.map((playlist, i) => ({
+        "@type": "ListItem",
         position: i + 1,
-        name: song.title,
-        url: song.youtubeUrl,
-        byArtist: { "@type": "MusicGroup", name: song.singer },
+        name: playlist.name,
+        url: `${site.url}/${playlist.id}`,
       })),
-    })),
+    },
     {
       "@type": "WebPage",
       "@id": `${site.url}/#webpage`,
@@ -57,7 +56,7 @@ export function StructuredData() {
       name: `${site.titleHi} · ${site.titleEn}`,
       description: site.description,
       isPartOf: { "@id": `${site.url}/#website` },
-      about: { "@id": `${site.url}/#${playlists[0]?.id ?? "playlist"}` },
+      mainEntity: { "@id": `${site.url}/#programmes` },
       inLanguage: "hi-IN",
     },
   ];

@@ -6,7 +6,7 @@ import { site } from "@/data/site";
 import { StageScene } from "@/components/StageScene";
 import { TopBar } from "@/components/TopBar";
 import { Masthead } from "@/components/Masthead";
-import { PageCopy } from "@/components/PageCopy";
+import { HomeContent } from "@/components/HomeContent";
 import { QuoteCard } from "@/components/QuoteCard";
 import { PlayerBar } from "@/components/PlayerBar";
 import { PlaylistsPanel } from "@/components/PlaylistsPanel";
@@ -52,13 +52,16 @@ export default function HomePage() {
     return () => window.removeEventListener("keydown", onKey);
   }, [radio, playlistsOpen, songsOpen]);
 
-  // The frame scrolls on a phone and is sealed on a desktop. A short landscape
-  // screen cannot fit the player and the title at once, and clipping there
-  // hides the scrubber rather than merely looking cramped — so the column is
-  // allowed to run over and be scrolled to. The stage behind is position:fixed,
-  // so it stays put while that happens.
+  // The stage is still exactly one screen — you arrive at it and nothing has
+  // moved. What changed is that the page no longer ends there: the writing sits
+  // below the fold, so scrolling is now the document's job rather than an
+  // inner overflow. The artwork is position:fixed and stays put behind it.
   return (
-    <main className="relative h-dvh w-full overflow-x-hidden overflow-y-auto sm:overflow-hidden">
+    // `clip` rather than `hidden`: overflow-x:hidden forces the computed
+    // overflow-y to `auto`, which quietly turns this into a nested scroll
+    // container and takes scrolling away from the document — anchor links stop
+    // landing where they should. `clip` trims the same overflow without it.
+    <main className="relative w-full overflow-x-clip">
       <StageScene />
 
       {/* The YouTube iframe stays mounted off-screen for the whole session.
@@ -83,7 +86,7 @@ export default function HomePage() {
 
           From sm up there is room for the poster composition it was designed
           as, so each child re-absolutes itself against this box. */}
-      <div className="relative z-10 flex min-h-full flex-col sm:block">
+      <div className="relative z-10 flex min-h-dvh flex-col sm:block">
         <TopBar
           live={player.playing}
           onOpenPlaylists={() => setPlaylistsOpen(true)}
@@ -105,7 +108,7 @@ export default function HomePage() {
         </footer>
       </div>
 
-      <PageCopy />
+      <HomeContent />
 
       <QuoteCard />
 
