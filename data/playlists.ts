@@ -59,6 +59,7 @@ export const playlists: Playlist[] = [
     nameHi: "छत्तीसगढ़ी ऑर्केस्ट्रा",
     tagline: "गाँव के मंच से, सीधे",
     songs: [
+      { title: "नीबू चाट ले उतारा मार ले", singer: "Hemlal Chaturvedi", youtubeUrl: "https://youtu.be/KRZiY0Lf5lY", duration: "5:05", mood: "dhun", lang: "cg", year: 2020 },
       { title: "तड़पेला मोरा चढल जवानी", singer: "भोजपुरी गाना", youtubeUrl: "https://youtu.be/B53LtEwuaQo", duration: "6:29", mood: "romantic", lang: "cg", year: 2014 },
       { title: "A Mor Rongobati Galara Bai O De De Mola Chume la Gorelal barman Cg Rajesh Sahu", singer: "Rajesh RS", youtubeUrl: "https://youtu.be/JERYeqtynBI", duration: "5:16", mood: "dhun", lang: "cg", year: 2019 },
       { title: "गर्मी के दिन माँ पीपर तरी", singer: "SUNDRANI", youtubeUrl: "https://youtu.be/eStBJ543t9c", duration: "5:03", mood: "dance", lang: "cg", year: 2017 },
@@ -71,7 +72,6 @@ export const playlists: Playlist[] = [
       { title: "Mai turi fuljhadi re", singer: "सीमा कौशिक सुपर हिट गाना", youtubeUrl: "https://youtu.be/qNmmPhvITsk", duration: "4:06", mood: "dhun", lang: "cg", year: 2019 },
       { title: "Turi Fataka O", singer: "Gorelal Barman", youtubeUrl: "https://youtu.be/9jVpFi6gV2s", duration: "4:49", mood: "dhun", lang: "cg", year: 2020 },
       { title: "ऐसो मोरो बिहाव करादे वो दाई cg", singer: "SHORT_VIDEOS_", youtubeUrl: "https://youtu.be/RDLN0SUnC4s", duration: "4:45", mood: "dhun", lang: "cg", year: 2021 },
-      { title: "नीबू चाट ले उतारा मार ले", singer: "Hemlal Chaturvedi", youtubeUrl: "https://youtu.be/KRZiY0Lf5lY", duration: "5:05", mood: "dhun", lang: "cg", year: 2020 },
       { title: "ये पान वाला बाबू", singer: "Album - Lali Bindiya", youtubeUrl: "https://youtu.be/FZpz1qD4LLw", duration: "6:07", mood: "dhun", lang: "cg", year: 2017 },
       { title: "ले ले मजा", singer: "Dj Sameer Mandla", youtubeUrl: "https://youtu.be/tVBN2dXKRC8", duration: "1:40", mood: "dhun", lang: "cg", year: 2023 },
       { title: "Tana Tan Turi Tor Baal Khula Khula", singer: "Natraj Cassette Barhi", youtubeUrl: "https://youtu.be/Xu5sJHlVzYI", duration: "7:40", mood: "dhun", lang: "cg", year: 2017 },
@@ -87,6 +87,7 @@ export const playlists: Playlist[] = [
     nameHi: "स्टेज प्रोग्राम",
     tagline: "साउंड चेक से सुबह तक",
     songs: [
+      { title: "नीबू चाट ले उतारा मार ले", singer: "Hemlal Chaturvedi", youtubeUrl: "https://youtu.be/KRZiY0Lf5lY", duration: "5:05", mood: "dhun", lang: "cg", year: 2020 },
       { title: "तड़पेला मोरा चढल जवानी", singer: "भोजपुरी गाना", youtubeUrl: "https://youtu.be/B53LtEwuaQo", duration: "6:29", mood: "romantic", lang: "cg", year: 2014 },
       { title: "A Mor Rongobati Galara Bai O De De Mola Chume la Gorelal barman Cg Rajesh Sahu", singer: "Rajesh RS", youtubeUrl: "https://youtu.be/JERYeqtynBI", duration: "5:16", mood: "dhun", lang: "cg", year: 2019 },
       { title: "गर्मी के दिन माँ पीपर तरी", singer: "SUNDRANI", youtubeUrl: "https://youtu.be/eStBJ543t9c", duration: "5:03", mood: "dance", lang: "cg", year: 2017 },
@@ -102,7 +103,6 @@ export const playlists: Playlist[] = [
       { title: "Mai turi fuljhadi re", singer: "सीमा कौशिक सुपर हिट गाना", youtubeUrl: "https://youtu.be/qNmmPhvITsk", duration: "4:06", mood: "dhun", lang: "cg", year: 2019 },
       { title: "Turi Fataka O", singer: "Gorelal Barman", youtubeUrl: "https://youtu.be/9jVpFi6gV2s", duration: "4:49", mood: "dhun", lang: "cg", year: 2020 },
       { title: "ऐसो मोरो बिहाव करादे वो दाई cg", singer: "SHORT_VIDEOS_", youtubeUrl: "https://youtu.be/RDLN0SUnC4s", duration: "4:45", mood: "dhun", lang: "cg", year: 2021 },
-      { title: "नीबू चाट ले उतारा मार ले", singer: "Hemlal Chaturvedi", youtubeUrl: "https://youtu.be/KRZiY0Lf5lY", duration: "5:05", mood: "dhun", lang: "cg", year: 2020 },
       { title: "ये पान वाला बाबू", singer: "Album - Lali Bindiya", youtubeUrl: "https://youtu.be/FZpz1qD4LLw", duration: "6:07", mood: "dhun", lang: "cg", year: 2017 },
       { title: "चालू कर जरनेटर", singer: "Sakal Balmua", youtubeUrl: "https://youtu.be/71yzX1SA56A", duration: "6:32", mood: "romantic", lang: "bhojpuri", year: 2014 },
       { title: "Bhojpuri में तहलका मचाने वाला गाना", singer: "JMC Music Bhojpuri", youtubeUrl: "https://youtu.be/ayLRDypkFfI", duration: "6:28", mood: "dance", lang: "bhojpuri", year: 2019 },
@@ -186,6 +186,7 @@ export const playlists: Playlist[] = [
     nameHi: "ऑर्केस्ट्रा क्लासिक्स",
     tagline: "फिल्मी गाना, लोकल बैंड",
     songs: [
+      { title: "नीबू चाट ले उतारा मार ले", singer: "Hemlal Chaturvedi", youtubeUrl: "https://youtu.be/KRZiY0Lf5lY", duration: "5:05", mood: "dhun", lang: "cg", year: 2020 },
       { title: "A Mor Rongobati Galara Bai O De De Mola Chume la Gorelal barman Cg Rajesh Sahu", singer: "Rajesh RS", youtubeUrl: "https://youtu.be/JERYeqtynBI", duration: "5:16", mood: "dhun", lang: "cg", year: 2019 },
       { title: "Son Ke Nathani II सोन के नथनी II Chandan Deep II Diman Sen II Kanchan Joshi", singer: "Creative Vision", youtubeUrl: "https://youtu.be/QLgRe9gJqSY", duration: "5:24", mood: "late-night", lang: "hindi", year: 2022 },
       { title: "Raja Raja Kareja Mein Samaja Raja Kareja Mein Samaja", singer: "T-Series Regional", youtubeUrl: "https://youtu.be/1y57siuuoX8", duration: "8:19", mood: "romantic", lang: "hindi", year: 2011 },
@@ -201,7 +202,6 @@ export const playlists: Playlist[] = [
       { title: "Mai turi fuljhadi re", singer: "सीमा कौशिक सुपर हिट गाना", youtubeUrl: "https://youtu.be/qNmmPhvITsk", duration: "4:06", mood: "dhun", lang: "cg", year: 2019 },
       { title: "Turi Fataka O", singer: "Gorelal Barman", youtubeUrl: "https://youtu.be/9jVpFi6gV2s", duration: "4:49", mood: "dhun", lang: "cg", year: 2020 },
       { title: "ऐसो मोरो बिहाव करादे वो दाई cg", singer: "SHORT_VIDEOS_", youtubeUrl: "https://youtu.be/RDLN0SUnC4s", duration: "4:45", mood: "dhun", lang: "cg", year: 2021 },
-      { title: "नीबू चाट ले उतारा मार ले", singer: "Hemlal Chaturvedi", youtubeUrl: "https://youtu.be/KRZiY0Lf5lY", duration: "5:05", mood: "dhun", lang: "cg", year: 2020 },
       { title: "ये पान वाला बाबू", singer: "Album - Lali Bindiya", youtubeUrl: "https://youtu.be/FZpz1qD4LLw", duration: "6:07", mood: "dhun", lang: "cg", year: 2017 },
       { title: "Dil Wali", singer: "Vivek Sharma - Topic", youtubeUrl: "https://youtu.be/1S9OHjlWov4", duration: "5:13", mood: "romantic", lang: "hindi", year: 2025 },
       { title: "ले ले मजा", singer: "Dj Sameer Mandla", youtubeUrl: "https://youtu.be/tVBN2dXKRC8", duration: "1:40", mood: "dhun", lang: "cg", year: 2023 },
