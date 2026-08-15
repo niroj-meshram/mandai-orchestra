@@ -6,6 +6,7 @@ import { site } from "@/data/site";
 import { StageScene } from "@/components/StageScene";
 import { TopBar } from "@/components/TopBar";
 import { Masthead } from "@/components/Masthead";
+import { PageCopy } from "@/components/PageCopy";
 import { QuoteCard } from "@/components/QuoteCard";
 import { PlayerBar } from "@/components/PlayerBar";
 import { PlaylistsPanel } from "@/components/PlaylistsPanel";
@@ -73,12 +74,17 @@ export default function HomePage() {
 
       <Masthead />
 
+      <PageCopy />
+
       <QuoteCard />
 
       <PlayerBar radio={radio} />
 
-      <footer className="pointer-events-none absolute inset-x-0 bottom-3 z-10 px-4 text-center">
-        <p className="font-body text-[10px] uppercase tracking-[0.34em] text-cream-dim/45 sm:text-[11px]">
+      {/* The tracking is what makes this line long. At 0.34em it wraps to two
+          lines on a phone and the second one lands under the player, so the
+          spacing tightens before the type size does. */}
+      <footer className="pointer-events-none absolute inset-x-0 bottom-2.5 z-10 px-3 text-center sm:bottom-3 sm:px-4">
+        <p className="font-body text-[8px] uppercase tracking-[0.16em] text-cream-dim/45 sm:text-[11px] sm:tracking-[0.34em]">
           {site.footer}
         </p>
       </footer>

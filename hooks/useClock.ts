@@ -44,16 +44,21 @@ export function useClock() {
   }, []);
 
   if (!now) {
-    return { time: null, meridiem: null, date: null, isLate: false };
+    return { time: null, meridiem: null, date: null, dateShort: null, isLate: false };
   }
 
   const hours = now.getHours();
   const h12 = hours % 12 || 12;
+  const day = DAYS[now.getDay()];
+  const month = MONTHS[now.getMonth()];
 
   return {
     time: `${h12}:${now.getMinutes().toString().padStart(2, "0")}`,
     meridiem: hours >= 12 ? "PM" : "AM",
-    date: `${DAYS[now.getDay()]}, ${now.getDate()} ${MONTHS[now.getMonth()]} ${now.getFullYear()}`,
+    date: `${day}, ${now.getDate()} ${month} ${now.getFullYear()}`,
+    /** Abbreviated for phones, where the full date runs out of room and gets
+        clipped mid-word by the buttons on the other side of the bar. */
+    dateShort: `${day.slice(0, 3)}, ${now.getDate()} ${month.slice(0, 3)}`,
     /** After 10 PM the night is properly under way. */
     isLate: hours >= 22 || hours < 5,
   };

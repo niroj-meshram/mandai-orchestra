@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
+  <!-- The mark from components/Logo.tsx, sized for a browser tab and a search
+       result: dark disc, amber play wedge, three tape stripes across it. -->
+  <circle cx="16" cy="16" r="16" fill="#150d08" />
+  <circle cx="16" cy="16" r="15" fill="none" stroke="#d8b978" stroke-opacity="0.35" stroke-width="1.5" />
+  <path d="M11.5 8.5 24 16 11.5 23.5Z" fill="#e9a34c" stroke="#e9a34c" stroke-width="2" stroke-linejoin="round" />
+  <g stroke="#f2e6d0" stroke-width="1.6" stroke-linecap="round" opacity="0.92">
+    <path d="M14.4 11.7v8.6M17.8 13.2v5.6M21.2 14.7v2.6" />
+  </g>
+</svg>

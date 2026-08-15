@@ -4,10 +4,15 @@ import { site } from "@/data/site";
  * The title block sitting over the stage roof. The Hindi name leads at full
  * size, the English name reads as its translation underneath, and the tagline
  * closes the group — three sizes, one centre line, nothing else.
+ *
+ * On a phone the title has to clear the top-left column, which is a stack of
+ * fixed-height rows — so the offset there is in px too. A vh offset tracks the
+ * viewport instead of the thing it needs to sit below, and on a short screen
+ * the title climbs straight into the clock and the credit.
  */
 export function Masthead() {
   return (
-    <div className="pointer-events-none absolute inset-x-0 top-[15vh] z-10 px-6 text-center sm:top-[17vh]">
+    <div className="pointer-events-none absolute inset-x-0 top-[152px] z-10 px-5 text-center sm:top-[17vh] sm:px-6">
       {/* Painted gold rather than coloured gold: a top-down gradient is clipped
           to the glyphs so each letter is pale at the head and deepens toward
           the foot, the way the name reads on the stage banner.
@@ -24,7 +29,7 @@ export function Masthead() {
       <h1
         className="anim-rise font-display leading-[1.04]"
         style={{
-          fontSize: "clamp(2.7rem, 8.2vw, 6.2rem)",
+          fontSize: "clamp(2.15rem, 8.2vw, 6.2rem)",
           backgroundImage:
             "linear-gradient(180deg, #fbf0cd 0%, #f4dc95 34%, #e4b45c 68%, #c9922f 100%)",
           WebkitBackgroundClip: "text",

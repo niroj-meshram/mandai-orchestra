@@ -90,6 +90,8 @@ export const playlists: Playlist[] = [
       { title: "ATARIYA LE KHADE", singer: "SUNDRANI ENTERTAINMENT", youtubeUrl: "https://youtu.be/ggios7SrhEY", duration: "4:46", mood: "dhun", year: 2018 },
       { title: "Bandh Kamre Mein Pyar Karenge", singer: "Kuch Khatti Kuch Meethi", youtubeUrl: "https://youtu.be/-QxqI8bFG_s", duration: "6:47", mood: "romantic", year: 2024 },
       { title: "San Sana San Say Say", singer: "Laxmi Sargujiha", youtubeUrl: "https://youtu.be/TDsCqZaPTSA", duration: "6:48", mood: "dhun", year: 2018 },
+      { title: "Bandook Chalgi Sapna Chaudhary & Narender Bhagana", singer: "Haryanvi Hits Song", youtubeUrl: "https://youtu.be/85txbeyiXNI", duration: "4:41", mood: "dhun", year: 2019 },
+      { title: "Lal Yadav एवं Kajal Raghwani", singer: "IVY Yashi Films Bhojpuri", youtubeUrl: "https://youtu.be/kfdplJ49_f0", duration: "4:14", mood: "dhun", year: 2019 },
     ],
   },
 ];

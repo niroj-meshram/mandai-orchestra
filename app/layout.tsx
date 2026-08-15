@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import { Tiro_Devanagari_Hindi, Mukta } from "next/font/google";
 import { site } from "@/data/site";
+import { StructuredData } from "@/components/StructuredData";
 import "./globals.css";
 
 /**
@@ -23,13 +24,63 @@ const mukta = Mukta({
 });
 
 export const metadata: Metadata = {
-  title: `${site.titleHi} · ${site.titleEn}`,
-  description:
-    "छत्तीसगढ़ी • भोजपुरी • स्टेज क्लासिक्स — a mandai night that never got packed up.",
+  // Every relative URL below resolves against this, so the canonical tag, the
+  // sitemap and the social card all point at one hostname.
+  metadataBase: new URL(site.url),
+
+  title: {
+    default: `${site.titleHi} · ${site.titleEn} — CG, Bhojpuri & Stage Classics`,
+    template: `%s · ${site.titleEn}`,
+  },
+  description: site.description,
+  // Copied out of the readonly `as const` tuple that `site` is declared as.
+  keywords: [...site.keywords],
+  applicationName: site.titleEn,
+  category: "music",
+  authors: [{ name: site.author.name, url: site.author.linkedin }],
+  creator: site.author.name,
+  publisher: site.author.name,
+
+  alternates: {
+    canonical: "/",
+    languages: { "hi-IN": "/", "en-IN": "/" },
+  },
+
   openGraph: {
-    title: `${site.titleHi} · ${site.titleEn}`,
-    description: site.taglineHi,
     type: "website",
+    siteName: site.titleEn,
+    locale: "hi_IN",
+    url: site.url,
+    title: `${site.titleHi} · ${site.titleEn}`,
+    description: site.description,
+    images: [
+      {
+        url: "/stage/scene.png",
+        width: 1672,
+        height: 941,
+        alt: "मंडई ऑर्केस्ट्रा — the lit stage at a mandai night",
+      },
+    ],
+  },
+
+  twitter: {
+    card: "summary_large_image",
+    title: `${site.titleHi} · ${site.titleEn}`,
+    description: site.descriptionShort,
+    images: ["/stage/scene.png"],
+    creator: "@nrjmeshram1998",
+  },
+
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      "max-image-preview": "large",
+      "max-snippet": -1,
+      "max-video-preview": -1,
+    },
   },
 };
 
@@ -49,6 +100,7 @@ export default function RootLayout({
     <html lang="hi" className={`${tiro.variable} ${mukta.variable}`}>
       <head>
         <link rel="preconnect" href="https://www.youtube-nocookie.com" />
+        <StructuredData />
       </head>
       <body className="bg-ink antialiased">{children}</body>
     </html>

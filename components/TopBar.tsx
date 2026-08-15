@@ -19,18 +19,18 @@ export function TopBar({
   onOpenPlaylists: () => void;
   onOpenSongs: () => void;
 }) {
-  const { time, meridiem, date } = useClock();
+  const { time, meridiem, date, dateShort } = useClock();
 
   return (
-    <header className="pointer-events-none absolute inset-x-0 top-0 z-20 px-5 pt-5 sm:px-8 sm:pt-7">
-      <div className="flex items-start justify-between gap-4">
+    <header className="pointer-events-none absolute inset-x-0 top-0 z-20 px-4 pt-4 sm:px-8 sm:pt-7">
+      <div className="flex items-start justify-between gap-3 sm:gap-4">
         {/* ── Clock ─────────────────────────────────────────────────────── */}
         <div className="anim-fade min-w-0">
-          <p className="font-display text-2xl leading-none text-cream sm:text-[32px]">
+          <p className="font-display text-xl leading-none text-cream sm:text-[32px]">
             {time ? (
               <>
                 {time}
-                <span className="ml-1.5 text-base text-cream-dim sm:text-lg">
+                <span className="ml-1.5 text-sm text-cream-dim sm:text-lg">
                   {meridiem}
                 </span>
               </>
@@ -39,13 +39,18 @@ export function TopBar({
             )}
           </p>
 
-          <p className="mt-1 truncate font-body text-[10px] uppercase tracking-[0.2em] text-cream-dim sm:text-[11px]">
+          {/* The full date runs into the buttons on a phone and gets clipped
+              mid-word, so the short form carries the small screens. */}
+          <p className="mt-1 hidden whitespace-nowrap font-body uppercase tracking-[0.2em] text-cream-dim sm:block sm:text-[11px]">
             {date ?? " "}
+          </p>
+          <p className="mt-1 whitespace-nowrap font-body text-[9.5px] uppercase tracking-[0.16em] text-cream-dim sm:hidden">
+            {dateShort ?? ""}
           </p>
 
           <span
             aria-hidden
-            className="mt-2.5 block h-px w-24 sm:w-32"
+            className="mt-2 block h-px w-20 sm:mt-2.5 sm:w-32"
             style={{
               background:
                 "linear-gradient(90deg, rgba(216,185,120,0.5), transparent)",
@@ -57,7 +62,7 @@ export function TopBar({
               always reads LIVE PROGRAM. The lamp only pulses once sound is
               actually coming out. */}
           <p
-            className="mt-4 inline-flex items-center gap-2 rounded-full border px-2.5 py-1"
+            className="mt-3 inline-flex items-center gap-2 rounded-full border px-2 py-0.5 sm:mt-4 sm:px-2.5 sm:py-1"
             style={{
               borderColor: "rgba(214,65,47,0.5)",
               background: "rgba(10,6,4,0.5)",
@@ -71,7 +76,7 @@ export function TopBar({
               )}
               style={{ boxShadow: "0 0 8px var(--color-ember)" }}
             />
-            <span className="font-body text-[10px] font-medium uppercase tracking-[0.22em] text-cream">
+            <span className="font-body text-[9px] font-medium uppercase tracking-[0.18em] text-cream sm:text-[10px] sm:tracking-[0.22em]">
               Live Program
             </span>
           </p>
@@ -81,11 +86,14 @@ export function TopBar({
               without competing with it. Two destinations means the name can no
               longer be the link, so it reads as a line of text and the icons
               carry the addresses. */}
-          <div className="mt-4 flex w-fit items-center gap-2">
-            <span className="font-body text-[10px] uppercase tracking-[0.2em] text-cream-dim/70">
+          <div className="mt-2.5 flex w-fit items-center gap-1.5 sm:mt-4 sm:gap-2">
+            {/* whitespace-nowrap is load-bearing: without it the narrow column
+                on a phone breaks this into stacked words that run down into the
+                title behind it. */}
+            <span className="whitespace-nowrap font-body text-[8.5px] uppercase tracking-[0.16em] text-cream-dim/70 sm:text-[10px] sm:tracking-[0.2em]">
               Built by
             </span>
-            <span className="font-body text-[11px] font-medium tracking-wide text-cream">
+            <span className="whitespace-nowrap font-body text-[10px] font-medium tracking-wide text-cream sm:text-[11px]">
               {site.author.name}
             </span>
 
@@ -168,10 +176,10 @@ function TopButton({
     <button
       type="button"
       onClick={onClick}
-      className="glass flex items-center gap-2 rounded-lg px-3 py-2.5 transition-colors duration-200 hover:border-gold/40 hover:bg-brown/60 sm:px-4"
+      className="glass flex shrink-0 items-center gap-1.5 rounded-lg px-2.5 py-2 transition-colors duration-200 hover:border-gold/40 hover:bg-brown/60 sm:gap-2 sm:px-4 sm:py-2.5"
     >
       <span className="text-amber">{icon}</span>
-      <span className="font-body text-xs font-medium text-cream sm:text-sm">
+      <span className="whitespace-nowrap font-body text-[11px] font-medium text-cream sm:text-sm">
         {children}
       </span>
     </button>
