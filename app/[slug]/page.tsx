@@ -99,7 +99,7 @@ export default async function CategoryPage({
             "@type": "ListItem",
             position: 1,
             name: site.titleEn,
-            item: `${site.url}/`,
+            item: site.url,
           },
           {
             "@type": "ListItem",

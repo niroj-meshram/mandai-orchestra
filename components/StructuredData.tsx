@@ -20,7 +20,7 @@ export function StructuredData() {
     {
       "@type": "WebSite",
       "@id": `${site.url}/#website`,
-      url: `${site.url}/`,
+      url: site.url,
       name: site.titleEn,
       alternateName: [site.titleHi, "CG Orchestra", "Mandai Archestra"],
       description: site.description,
@@ -52,7 +52,7 @@ export function StructuredData() {
     {
       "@type": "WebPage",
       "@id": `${site.url}/#webpage`,
-      url: `${site.url}/`,
+      url: site.url,
       name: `${site.titleHi} · ${site.titleEn}`,
       description: site.description,
       isPartOf: { "@id": `${site.url}/#website` },

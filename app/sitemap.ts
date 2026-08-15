@@ -18,7 +18,11 @@ export default function sitemap(): MetadataRoute.Sitemap {
 
   return [
     {
-      url: `${site.url}/`,
+      // No trailing slash, to match exactly what the canonical tag emits.
+      // Listing "…/" here while the page declares "…" as its canonical is the
+      // kind of disagreement Search Console reports as "duplicate, Google
+      // chose a different canonical".
+      url: site.url,
       lastModified: now,
       changeFrequency: "weekly",
       priority: 1,
