@@ -7,6 +7,7 @@ import { StageScene } from "@/components/StageScene";
 import { TopBar } from "@/components/TopBar";
 import { Masthead } from "@/components/Masthead";
 import { HomeContent } from "@/components/HomeContent";
+import { CurtainIntro } from "@/components/CurtainIntro";
 import { QuoteCard } from "@/components/QuoteCard";
 import { PlayerBar } from "@/components/PlayerBar";
 import { PlaylistsPanel } from "@/components/PlaylistsPanel";
@@ -109,6 +110,8 @@ export default function HomePage() {
       </div>
 
       <HomeContent />
+
+      <CurtainIntro />
 
       <QuoteCard />
 

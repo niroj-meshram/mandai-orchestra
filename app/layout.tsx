@@ -103,6 +103,16 @@ export default function RootLayout({
       <head>
         <link rel="preconnect" href="https://www.youtube-nocookie.com" />
         <StructuredData />
+        {/* Decides before the first paint whether the curtain runs, so a
+            returning visitor never sees a closed curtain flash up and vanish.
+            `?curtain` forces it back on for a look. Wrapped in try/catch
+            because sessionStorage throws outright in some private modes, and
+            an unhandled throw here would take the page down with it. */}
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `try{var f=location.search.indexOf('curtain')>-1;var s=sessionStorage.getItem('mo-curtain');document.documentElement.dataset.curtain=(s&&!f)?'skip':'play';sessionStorage.setItem('mo-curtain','1')}catch(e){document.documentElement.dataset.curtain='play'}`,
+          }}
+        />
       </head>
       <body className="bg-ink antialiased">{children}</body>
     </html>
