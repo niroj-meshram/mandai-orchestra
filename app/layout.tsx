@@ -3,6 +3,7 @@ import { Tiro_Devanagari_Hindi, Mukta } from "next/font/google";
 import { site } from "@/data/site";
 import { StructuredData } from "@/components/StructuredData";
 import "./globals.css";
+import { Analytics } from "@vercel/analytics/next"
 
 /**
  * Two faces, both drawn for Devanagari first:
@@ -114,7 +115,10 @@ export default function RootLayout({
           }}
         />
       </head>
-      <body className="bg-ink antialiased">{children}</body>
+      <body className="bg-ink antialiased">
+        {children}
+        <Analytics />
+      </body>
     </html>
   );
 }
