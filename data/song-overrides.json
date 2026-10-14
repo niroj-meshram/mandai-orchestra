@@ -1,0 +1,4 @@
+{
+  "$comment": "Hand fixes, keyed by YouTube video id. Applied by every sync, so they survive it. Fields, all optional: title, singer, mood, lang, hide (true drops the song). npm run song-report lists what probably needs fixing.",
+  "$example": { "VIDEOID1234": { "title": "Correct title", "singer": "Real singer", "hide": false } }
+}

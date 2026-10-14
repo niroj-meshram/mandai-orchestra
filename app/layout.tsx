@@ -39,6 +39,14 @@ export const metadata: Metadata = {
   // Copied out of the readonly `as const` tuple that `site` is declared as.
   keywords: [...site.keywords],
   applicationName: site.titleEn,
+  // Opened from the iPhone home screen: full screen, dark status bar.
+  appleWebApp: {
+    capable: true,
+    title: site.titleEn,
+    // "black", not "black-translucent": the layout has no safe-area padding,
+    // so a translucent bar would sit on top of the top bar.
+    statusBarStyle: "black",
+  },
   category: "music",
   authors: [{ name: site.author.name, url: site.author.linkedin }],
   creator: site.author.name,
@@ -100,7 +108,12 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="hi" className={`${tiro.variable} ${mukta.variable}`}>
+    // The curtain script below sets data-curtain before React loads, on purpose.
+    <html
+      lang="hi"
+      className={`${tiro.variable} ${mukta.variable}`}
+      suppressHydrationWarning
+    >
       <head>
         <link rel="preconnect" href="https://www.youtube-nocookie.com" />
         <StructuredData />

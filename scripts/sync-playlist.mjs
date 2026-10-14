@@ -11,17 +11,18 @@
  *  install. Public and unlisted playlists both work; private ones do not, since
  *  the page never renders for a signed-out visitor.
  *
- *  The generated file is meant to be edited afterwards. YouTube titles are
- *  written by uploaders, not cataloguers, so the cleanup below is a best effort
- *  and the singer is frequently just the channel that posted the video. Fix the
- *  handful that read wrong; a re-run will overwrite them, so do the re-run first
- *  and the corrections second.
+ *  YouTube titles are written by uploaders, not cataloguers, so the cleanup
+ *  below is a best effort. Hand fixes go in data/song-overrides.json, which is
+ *  applied on every run — editing data/playlists.ts directly is lost on the
+ *  next sync. Each run also writes data/song-report.md: what was dropped, what
+ *  looks duplicated, and what still reads wrong.
  */
 
 import { writeFile } from "node:fs/promises";
 import { existsSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 import { dirname, resolve } from "node:path";
+import { applyOverrides, loadOverrides, readCurrentSongs, writeReport } from "./song-report.mjs";
 
 const HERE = dirname(fileURLToPath(import.meta.url));
 const OUT = resolve(HERE, "../data/playlists.ts");
@@ -202,8 +203,11 @@ async function fetchPlaylist(url) {
   return { title, items };
 }
 
-/** Upload year, read off the watch page. Worth one request; it is real data. */
-async function fetchYear(id) {
+/**
+ * Upload year and description, read off the watch page. One request for both;
+ * the description is where uploaders credit the singer properly.
+ */
+async function fetchDetails(id) {
   try {
     const html = await getText(`https://www.youtube.com/watch?v=${id}`);
     const date =
@@ -211,9 +215,37 @@ async function fetchYear(id) {
       html.match(/"uploadDate":"(\d{4})/)?.[1] ??
       html.match(/"publishDate":"(\d{4})/)?.[1];
     const year = Number(String(date ?? "").match(/\d{4}/)?.[0]);
-    return Number.isFinite(year) ? year : 0;
+    const rawDesc = html.match(/"attributedDescription":\{"content":"((?:[^"\\]|\\.)*)"/)?.[1];
+    let description = "";
+    try {
+      description = rawDesc ? JSON.parse(`"${rawDesc}"`) : "";
+    } catch {}
+    return { year: Number.isFinite(year) ? year : 0, description };
   } catch {
-    return 0;
+    return { year: 0, description: "" };
+  }
+}
+
+/**
+ * Whether the site can actually play a video. The playlist page only knows
+ * about deleted and private ones; a video whose owner has switched embedding
+ * off still lists fine and then fails in the player every time. oEmbed is the
+ * cheap, reliable check: 200 plays, 401/403 means embedding is disabled,
+ * 400/404 means it is gone. Anything else — a rate limit, a network blip — is
+ * "unknown", and unknown is kept.
+ */
+async function checkEmbed(id) {
+  try {
+    const res = await fetch(
+      `https://www.youtube.com/oembed?format=json&url=https://youtu.be/${id}`,
+      { headers: { "User-Agent": UA } }
+    );
+    if (res.ok) return "ok";
+    if (res.status === 401 || res.status === 403) return "embedding disabled by the uploader";
+    if (res.status === 400 || res.status === 404) return "video removed or private";
+    return "unknown";
+  } catch {
+    return "unknown";
   }
 }
 
@@ -237,7 +269,9 @@ async function pooled(items, limit, job) {
 const NOISE =
   /\b(full\s+)?(hd|4k|official|video|audio|song|movie|lyrical|lyrics|new|latest|superhit|super\s*hit|hit|dj|remix|mix|nonstop|non\s*stop|status|shorts?|trending|viral|album|presents?|exclusive)\b/gi;
 
-const SEPARATORS = /\s*(?:\|{1,2}|¦{1,2}|‖|·|—|–|\/{1,2})\s*/;
+// Including the danda (।), "II" / "ll" standing in for ‖, and a spaced colon
+// ("Chumma : Rajkummar, Triptii…").
+const SEPARATORS = /\s*(?:\|{1,2}|¦{1,2}|‖|·|—|–|\/{1,2}|।|\s(?:II|ll)\s|\s:\s)\s*/;
 
 function tidy(s) {
   return s
@@ -255,7 +289,13 @@ function tidy(s) {
  * sang it.
  */
 function splitTitle(raw, channel) {
-  const segments = raw.split(SEPARATORS).map(tidy).filter(Boolean);
+  // Bracketed asides go before splitting: "Chumma (Full Video): Rajkummar…"
+  // only shows its separator once "(Full Video)" is out of the way.
+  const segments = raw
+    .replace(/[\[\({][^\]\)}]*[\]\)}]/g, " ")
+    .split(SEPARATORS)
+    .map(tidy)
+    .filter(Boolean);
 
   let title = segments.find((s) => tidy(s.replace(NOISE, "")).length > 2) ?? raw;
   // Strip the keyword padding too, but never all the way to nothing — a few
@@ -299,11 +339,69 @@ function splitTitle(raw, channel) {
   const singer = match && tidy(match.replace(/^singer\s+/i, ""));
 
   return {
-    title: tidy(title.replace(/\s+-\s+.*$/, "")) || raw,
+    // A trailing "CG" is a tag, not part of the name.
+    title: tidy(title.replace(/\s+-\s+.*$/, "").replace(/\s+cg$/i, "")) || raw,
     // Falling back to the channel is a compromise: a label is not a singer, but
     // it is at least true, and it beats leaving the line blank.
-    singer: singer ? tidy(singer) : channel || "—",
+    singer: singer ? tidy(singer) : cleanChannel(channel) || "—",
+    // YouTube's auto "Artist - Topic" channels and "… Official" ones are the
+    // artist, so falling back to those is not a guess.
+    fromChannel: !singer && !/(\s-\s*topic|\sofficial)$/i.test(channel),
+    segments,
   };
+}
+
+/**
+ * Names as names: "LAXMI NARAYAN PANDEY" → "Laxmi Narayan Pandey", "Ratan
+ * sabiha" → "Ratan Sabiha". Devanagari has no case and passes through.
+ */
+function titleCase(name) {
+  if (/[ऀ-ॿ]/.test(name)) return name;
+  const base = name === name.toUpperCase() ? name.toLowerCase() : name;
+  return base.replace(/(^|[\s.(-])(\p{L})/gu, (_, a, b) => a + b.toUpperCase());
+}
+
+/**
+ * The credited singers from a video description: "Singer : X", "Singer Male:
+ * X", "गायक : X", "स्वर _ X" and the like. Up to three names; phone numbers and
+ * trailing punctuation dropped. Empty when nobody is credited.
+ */
+function singerFromDescription(description) {
+  const LINE = /^[^\p{L}]*(?:singers?(?:\s*\(s\))?(?:\s+(?:male|female))?|गायक|गायिका|गायन|स्वर)\s*[:\-–—_=>]*\s*(.+)$/iu;
+  const names = [];
+  for (const line of description.split("\n").slice(0, 40)) {
+    const m = line.trim().match(LINE);
+    // "Singer Recording: …" and the like are a different credit.
+    if (!m || m[1].includes(":")) continue;
+    const value = m[1]
+      .replace(/\s+-\s*(mo|mob|mobile|contact|ph)\b.*$/i, "")
+      .replace(/[+\d][\d\s,-]{6,}.*$/, "")
+      .replace(/[,;.\s]+$/, "");
+    for (const n of value.split(/\s*(?:,|&|\band\b|\/)\s*/i)) {
+      const name = titleCase(n.trim());
+      if (name.length >= 3 && !names.some((x) => x.toLowerCase() === name.toLowerCase())) {
+        names.push(name);
+      }
+    }
+  }
+  if (!names.length) return "";
+  return names.length > 3 ? `${names.slice(0, 3).join(", ")} & others` : names.join(", ");
+}
+
+/**
+ * A channel name made presentable as a fallback singer: YouTube's auto
+ * "Artist - Topic" channels and "… Official" are the artist; the rest stay as
+ * they are and get flagged by the report.
+ */
+function cleanChannel(channel) {
+  return titleCase(
+    tidy(
+      channel
+        .replace(/\s*-\s*topic$/i, "")
+        .replace(/\s*(official|vevo)$/i, "")
+        .replace(/\s*सुपर\s*हिट\s*गाना$/, "")
+    )
+  );
 }
 
 /** Rough sort by what the song is for. Only ever a starting point. */
@@ -523,12 +621,81 @@ async function main() {
 
   if (!parsed.length) throw new Error("Playlist parsed to zero playable songs");
 
-  console.log(`  fetching upload years…`);
-  const years = await pooled(parsed, 6, (s) => fetchYear(s.id));
-  const songs = parsed.map((s, i) => ({ ...s, year: years[i] }));
+  console.log(`  checking each video can play here, and reading descriptions…`);
+  const [details, embeds] = await Promise.all([
+    pooled(parsed, 6, (s) => fetchDetails(s.id)),
+    pooled(parsed, 6, (s) => checkEmbed(s.id)),
+  ]);
+
+  // If most of the list suddenly reads as unplayable, the check is what broke
+  // (a rate limit, a blocked IP), not the playlist. Keep everything then.
+  const failing = embeds.filter((e) => e !== "ok" && e !== "unknown").length;
+  const trustEmbeds = failing <= parsed.length / 2;
+  if (!trustEmbeds) {
+    console.warn(`  ! ${failing}/${parsed.length} videos failed the embed check — ignoring it this run`);
+  }
+
+  // YouTube's bot check sometimes serves a watch page with no description or
+  // date. When that happens, keep what the last sync found for the video
+  // rather than regressing to the channel name and year 0.
+  const previous = new Map();
+  try {
+    for (const song of await readCurrentSongs()) previous.set(song.id, song);
+  } catch {}
+
+  const dropped = [];
+  const fetched = [];
+  parsed.forEach((s, i) => {
+    const embed = embeds[i];
+    if (trustEmbeds && embed !== "ok" && embed !== "unknown") {
+      console.warn(`  ! dropping (${embed}): ${s.title.slice(0, 60)}`);
+      dropped.push({ id: s.id, title: s.title, why: embed });
+      return;
+    }
+
+    const { description } = details[i];
+    const before = previous.get(s.id);
+    const year = details[i].year || before?.year || 0;
+    // No description this time: the last sync's singer stands in for the
+    // credit, unless that too was only the channel.
+    const credited =
+      singerFromDescription(description) ||
+      (!description && before && before.singer !== s.singer ? before.singer : "");
+    let { title, singer, fromChannel } = s;
+    if (credited) {
+      singer = credited;
+      fromChannel = false;
+      // A title that is really a singer's name ("Dilip Lahariya | Rajkumari
+      // Chauhan | Dei De O Mola…") — take the first segment that is not one.
+      // Matched by words, so a shortened "Rajkumari" still counts as
+      // "Rajkumari Chauhan".
+      const creditWords = new Set(credited.toLowerCase().split(/[\s,&]+/));
+      const isName = (t) => {
+        const words = t.toLowerCase().split(/\s+/).filter(Boolean);
+        return words.length > 0 && words.every((w) => creditWords.has(w));
+      };
+      if (isName(title)) {
+        const better = s.segments.find((seg) => !isName(seg) && seg.replace(NOISE, "").trim().length > 3);
+        if (better) title = tidy(tidy(better.replace(NOISE, "")) || better);
+      }
+    }
+    const { segments, ...rest } = s;
+    fetched.push({ ...rest, title, singer, fromChannel, year });
+  });
+
+  const { songs, unused } = applyOverrides(fetched, await loadOverrides());
 
   const missing = songs.filter((s) => !s.year).length;
   if (missing) console.warn(`  ! ${missing} song(s) without a year; left as 0`);
+
+  const fromDesc = songs.filter((s) => !s.fromChannel).length;
+  console.log(`  ${fromDesc}/${songs.length} singers credited, ${songs.length - fromDesc} fall back to the channel`);
+
+  const report = await writeReport({ songs, dropped, unused });
+  console.log(
+    `  report: ${dropped.length} dropped, ${report.duplicates} possible duplicate(s), ` +
+      `${report.suspects} to check — data/song-report.md`
+  );
 
   await writeFile(OUT, render(songs, listTitle), "utf8");
   console.log(`Wrote ${songs.length} songs to data/playlists.ts`);

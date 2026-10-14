@@ -9,8 +9,8 @@ import {
 } from "@/lib/youtube";
 
 interface Options {
-  /** Called when the current video reaches its end. */
-  onEnded?: () => void;
+  /** Called when the current video reaches its end, or turns out unplayable. */
+  onEnded?: (failed: boolean) => void;
 }
 
 /**
@@ -32,7 +32,7 @@ export function useYouTubePlayer({ onEnded }: Options = {}) {
   const [failed, setFailed] = useState(false);
 
   // Pending video requested before the API finished loading.
-  const pendingRef = useRef<{ id: string; autoplay: boolean } | null>(null);
+  const pendingRef = useRef<{ id: string; autoplay: boolean; start: number } | null>(null);
 
   useEffect(() => {
     let cancelled = false;
@@ -57,8 +57,9 @@ export function useYouTubePlayer({ onEnded }: Options = {}) {
             const pending = pendingRef.current;
             if (pending) {
               pendingRef.current = null;
-              if (pending.autoplay) player.loadVideoById(pending.id);
-              else player.cueVideoById(pending.id);
+              const video = { videoId: pending.id, startSeconds: pending.start };
+              if (pending.autoplay) player.loadVideoById(video);
+              else player.cueVideoById(video);
             }
           },
           onStateChange: (e: { data: number }) => {
@@ -66,14 +67,14 @@ export function useYouTubePlayer({ onEnded }: Options = {}) {
             setPlaying(e.data === PlayerState.PLAYING);
             setBuffering(e.data === PlayerState.BUFFERING);
             if (e.data === PlayerState.PLAYING) setFailed(false);
-            if (e.data === PlayerState.ENDED) endedRef.current?.();
+            if (e.data === PlayerState.ENDED) endedRef.current?.(false);
           },
           onError: () => {
             if (cancelled) return;
             // Unplayable / blocked video — skip on rather than stall the stage.
             setFailed(true);
             setPlaying(false);
-            endedRef.current?.();
+            endedRef.current?.(true);
           },
         },
       });
@@ -101,22 +102,25 @@ export function useYouTubePlayer({ onEnded }: Options = {}) {
     return () => window.clearInterval(id);
   }, [playing]);
 
-  const load = useCallback((url: string, autoplay = true) => {
+  /** `start` begins partway in — used to pick up where a last visit left off. */
+  const load = useCallback((url: string, autoplay = true, start = 0) => {
     const id = parseVideoId(url);
     if (!id) {
       setFailed(true);
+      endedRef.current?.(true);
       return;
     }
-    setCurrentTime(0);
+    setCurrentTime(start);
     setDuration(0);
     setFailed(false);
     const p = playerRef.current;
     if (!p) {
-      pendingRef.current = { id, autoplay };
+      pendingRef.current = { id, autoplay, start };
       return;
     }
-    if (autoplay) p.loadVideoById(id);
-    else p.cueVideoById(id);
+    const video = { videoId: id, startSeconds: start };
+    if (autoplay) p.loadVideoById(video);
+    else p.cueVideoById(video);
   }, []);
 
   const play = useCallback(() => playerRef.current?.playVideo(), []);

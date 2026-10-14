@@ -180,3 +180,35 @@ export const SearchIcon = ({ size = 16, className }: IconProps) => (
     <path d="m16 16 4 4" />
   </svg>
 );
+
+export const ShuffleIcon = ({ size = 16, className }: IconProps) => (
+  <svg {...box(size)} {...stroke} className={className}>
+    <path d="M4 7h3.5c2 0 3.2 1 4.3 2.6l2.4 4.8c1.1 1.6 2.3 2.6 4.3 2.6H20" />
+    <path d="M4 17h3.5c1.4 0 2.4-.5 3.2-1.3M14.3 8.3c.8-.8 1.8-1.3 3.2-1.3H20" />
+    <path d="m17.5 4.5 2.5 2.5-2.5 2.5M17.5 14.5l2.5 2.5-2.5 2.5" />
+  </svg>
+);
+
+/** Repeat with a small "1" inside: the same song again. */
+export const RepeatOneIcon = ({ size = 16, className }: IconProps) => (
+  <svg {...box(size)} {...stroke} className={className}>
+    <path d="M17 3.5 19.5 6 17 8.5" />
+    <path d="M4.5 11.5V10a4 4 0 0 1 4-4h11" />
+    <path d="M7 20.5 4.5 18 7 15.5" />
+    <path d="M19.5 12.5V14a4 4 0 0 1-4 4h-11" />
+    <path d="M11.3 10.6 12.4 10v4.2" strokeWidth={1.5} />
+  </svg>
+);
+
+export const ShareIcon = ({ size = 16, className }: IconProps) => (
+  <svg {...box(size)} {...stroke} className={className}>
+    <path d="M12 3.5v11M8 7.5l4-4 4 4" />
+    <path d="M6 11H5a1.5 1.5 0 0 0-1.5 1.5v6A1.5 1.5 0 0 0 5 20h14a1.5 1.5 0 0 0 1.5-1.5v-6A1.5 1.5 0 0 0 19 11h-1" />
+  </svg>
+);
+
+export const CheckIcon = ({ size = 16, className }: IconProps) => (
+  <svg {...box(size)} {...stroke} className={className}>
+    <path d="m5 12.5 4.5 4.5L19 7.5" />
+  </svg>
+);

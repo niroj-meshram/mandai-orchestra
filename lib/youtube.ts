@@ -7,8 +7,8 @@ export interface YTPlayer {
   playVideo(): void;
   pauseVideo(): void;
   stopVideo(): void;
-  loadVideoById(id: string): void;
-  cueVideoById(id: string): void;
+  loadVideoById(id: string | { videoId: string; startSeconds?: number }): void;
+  cueVideoById(id: string | { videoId: string; startSeconds?: number }): void;
   seekTo(seconds: number, allowSeekAhead: boolean): void;
   setVolume(volume: number): void;
   getVolume(): number;

@@ -4,6 +4,7 @@ import type { useOrchestraRadio } from "@/hooks/useOrchestraRadio";
 import { formatTime, cx } from "@/lib/utils";
 import { Cassette } from "./Cassette";
 import { Scrubber } from "./Scrubber";
+import { ShareButton } from "./ShareButton";
 import {
   PlayIcon,
   PauseIcon,
@@ -14,6 +15,8 @@ import {
   VolumeIcon,
   MuteIcon,
   NoteIcon,
+  ShuffleIcon,
+  RepeatOneIcon,
 } from "./icons";
 
 type Radio = ReturnType<typeof useOrchestraRadio>;
@@ -56,6 +59,14 @@ export function PlayerBar({ radio }: { radio: Radio }) {
               </span>
               <span className="truncate">{playlist.name}</span>
             </p>
+            {radio.upNext && (
+              <p
+                className="mt-0.5 truncate font-body text-[11px] leading-tight text-cream-dim/70"
+                title={radio.upNext.title}
+              >
+                {radio.repeatOne ? "Repeating this song" : `आगे · ${radio.upNext.title}`}
+              </p>
+            )}
           </div>
         </div>
 
@@ -127,6 +138,26 @@ export function PlayerBar({ radio }: { radio: Radio }) {
           </div>
 
           <div className="flex shrink-0 items-center justify-end gap-2.5">
+            <ToggleButton
+              label="Shuffle"
+              active={radio.shuffle}
+              onClick={radio.toggleShuffle}
+            >
+              <ShuffleIcon />
+            </ToggleButton>
+
+            <ToggleButton
+              label="Repeat this song"
+              active={radio.repeatOne}
+              onClick={radio.toggleRepeatOne}
+            >
+              <RepeatOneIcon />
+            </ToggleButton>
+
+            {song && <ShareButton song={song} />}
+
+            <span aria-hidden className="mx-0.5 h-4 w-px bg-gold/20" />
+
             <button
               type="button"
               onClick={() => radio.setVolume(volume === 0 ? 80 : 0)}
@@ -186,6 +217,41 @@ function IconButton({
       )}
     >
       {children}
+    </button>
+  );
+}
+
+/** A small on/off switch for a play mode. Lit amber, with a dot, when on. */
+function ToggleButton({
+  label,
+  active,
+  onClick,
+  children,
+}: {
+  label: string;
+  active: boolean;
+  onClick: () => void;
+  children: React.ReactNode;
+}) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      aria-label={label}
+      aria-pressed={active}
+      title={`${label}: ${active ? "on" : "off"}`}
+      className={cx(
+        "relative grid h-7 w-7 shrink-0 place-items-center rounded-full transition-colors hover:bg-cream/10",
+        active ? "text-amber" : "text-cream-dim hover:text-cream"
+      )}
+    >
+      {children}
+      {active && (
+        <span
+          aria-hidden
+          className="absolute -bottom-0.5 h-1 w-1 rounded-full bg-amber"
+        />
+      )}
     </button>
   );
 }
