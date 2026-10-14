@@ -173,3 +173,10 @@ export const HeartIcon = ({ size = 14, className }: IconProps) => (
     <path d="M12 20.3s-7.4-4.6-7.4-9.6A4.2 4.2 0 0 1 12 8.1a4.2 4.2 0 0 1 7.4 2.6c0 5-7.4 9.6-7.4 9.6Z" />
   </svg>
 );
+
+export const SearchIcon = ({ size = 16, className }: IconProps) => (
+  <svg {...box(size)} {...stroke} className={className}>
+    <circle cx="11" cy="11" r="6.5" />
+    <path d="m16 16 4 4" />
+  </svg>
+);
