@@ -17,6 +17,8 @@ npm install
 npm run dev      # http://localhost:3000
 npm run build    # production build
 npm start        # serve the production build
+npm test         # unit tests (search, play order, playlist parsing)
+npm run lint     # ESLint with Next's rules
 ```
 
 ---
@@ -31,32 +33,42 @@ framing notes are in [`public/stage/README.md`](public/stage/README.md).
 It must be a **clean plate** — no text, no interface. All of that is live HTML
 on top.
 
-### 2. The music — `data/playlists.ts`
+### 2. The music — a YouTube playlist
 
-One file, six playlists. Paste a YouTube link into `youtubeUrl` and fill in the
-title, singer, duration, mood and year:
+The songs come from one YouTube playlist (`PLAYLIST` in
+`scripts/sync-playlist.mjs`). Add or remove videos there, then:
 
-```ts
+```sh
+npm run sync-playlist
+```
+
+That regenerates `data/playlists.ts` — titles, singers (from the "Singer: …"
+credit in each video's description where there is one), lengths, and which of
+the six programmes each song belongs to. Every build runs it, and a Vercel cron
+rebuilds nightly, so a playlist change reaches the site on its own.
+
+**Don't edit `data/playlists.ts` by hand** — the next sync overwrites it. Fixes
+go in `data/song-overrides.json`, keyed by video id, and are re-applied on
+every sync:
+
+```json
 {
-  title: "Sanjha Bihaniya",
-  singer: "Sundar Lal & Party",
-  youtubeUrl: "https://www.youtube.com/watch?v=XXXXXXXXXXX",
-  duration: "5:14",
-  mood: "dhun",
-  year: 2008,
+  "EHh-RNIrvYk": { "title": "Mai Balaghat Ka Tura", "singer": "Santosh Thakrele" },
+  "aSqwSiCe4eE": { "hide": true }
 }
 ```
 
-Any YouTube URL shape works — `watch?v=`, `youtu.be/`, `/embed/`, `/shorts/`.
+Any of `title`, `singer`, `mood`, `lang`, `hide`. To find what needs fixing:
 
-To add a playlist, copy one block and give it a new `id`. It appears in the
-Playlists panel on its own.
+```sh
+npm run song-report    # writes data/song-report.md
+```
 
-> **The sample songs are placeholders.** Titles are invented in the local
-> orchestra idiom and credited to generic troupe names, the way mandai
-> programmes were really billed ("… & Party") — they are not real recordings.
-> The video IDs are a few well-known public clips rotated through the list so
-> the player has something to play before you paste your own. Replace them all.
+It lists singers that are really a channel or label, titles still carrying the
+uploader's padding, likely duplicates (the same song uploaded twice, even when
+one title is in Devanagari and the other in Latin), and — after a sync — videos
+that were dropped because they are removed or have embedding switched off.
+Each entry comes with a line ready to paste into the overrides file.
 
 ---
 

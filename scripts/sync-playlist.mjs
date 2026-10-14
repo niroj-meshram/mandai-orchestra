@@ -389,6 +389,23 @@ function singerFromDescription(description) {
 }
 
 /**
+ * A title that is really a singer's name ("Dilip Lahariya | Rajkumari | Cg
+ * song | Dei De O Mola…") is swapped for the first title segment that is not
+ * one. Names are matched by word, so a shortened "Rajkumari" still counts as
+ * the credited "Rajkumari Chauhan".
+ */
+function titleAvoidingCredit(title, segments, credited) {
+  const creditWords = new Set(credited.toLowerCase().split(/[\s,&]+/));
+  const isName = (t) => {
+    const words = t.toLowerCase().split(/\s+/).filter(Boolean);
+    return words.length > 0 && words.every((w) => creditWords.has(w));
+  };
+  if (!isName(title)) return title;
+  const better = segments.find((seg) => !isName(seg) && seg.replace(NOISE, "").trim().length > 3);
+  return better ? tidy(tidy(better.replace(NOISE, "")) || better) : title;
+}
+
+/**
  * A channel name made presentable as a fallback singer: YouTube's auto
  * "Artist - Topic" channels and "… Official" are the artist; the rest stay as
  * they are and get flagged by the report.
@@ -665,20 +682,9 @@ async function main() {
     if (credited) {
       singer = credited;
       fromChannel = false;
-      // A title that is really a singer's name ("Dilip Lahariya | Rajkumari
-      // Chauhan | Dei De O Mola…") — take the first segment that is not one.
-      // Matched by words, so a shortened "Rajkumari" still counts as
-      // "Rajkumari Chauhan".
-      const creditWords = new Set(credited.toLowerCase().split(/[\s,&]+/));
-      const isName = (t) => {
-        const words = t.toLowerCase().split(/\s+/).filter(Boolean);
-        return words.length > 0 && words.every((w) => creditWords.has(w));
-      };
-      if (isName(title)) {
-        const better = s.segments.find((seg) => !isName(seg) && seg.replace(NOISE, "").trim().length > 3);
-        if (better) title = tidy(tidy(better.replace(NOISE, "")) || better);
-      }
+      title = titleAvoidingCredit(title, s.segments, credited);
     }
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars -- dropped from the output
     const { segments, ...rest } = s;
     fetched.push({ ...rest, title, singer, fromChannel, year });
   });
@@ -701,14 +707,28 @@ async function main() {
   console.log(`Wrote ${songs.length} songs to data/playlists.ts`);
 }
 
-try {
-  await main();
-} catch (err) {
-  console.warn(`\n  ! playlist sync failed: ${err.message}`);
-  if (existsSync(OUT)) {
-    console.warn(`  ! keeping the existing data/playlists.ts and carrying on.\n`);
-  } else {
-    console.error(`  ! no data/playlists.ts to fall back on — cannot continue.\n`);
-    process.exit(1);
+// The title and credit parsing, exported for the tests in tests/.
+export {
+  splitTitle,
+  titleAvoidingCredit,
+  singerFromDescription,
+  titleCase,
+  cleanChannel,
+  guessMood,
+  guessLang,
+};
+
+// Only sync when run as a script, not when the tests import the helpers.
+if (process.argv[1] === fileURLToPath(import.meta.url)) {
+  try {
+    await main();
+  } catch (err) {
+    console.warn(`\n  ! playlist sync failed: ${err.message}`);
+    if (existsSync(OUT)) {
+      console.warn(`  ! keeping the existing data/playlists.ts and carrying on.\n`);
+    } else {
+      console.error(`  ! no data/playlists.ts to fall back on — cannot continue.\n`);
+      process.exit(1);
+    }
   }
 }
